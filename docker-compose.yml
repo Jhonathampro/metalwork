@@ -1,0 +1,29 @@
+version: '3.8'
+
+services:
+    postgres:
+        image: postgres:17.4-alpine
+        container_name: serra_postgres
+        ports:
+            - 5433:5432  # Porta externa 5433, interna 5432
+        environment:
+            POSTGRES_USER: 'serra'
+            POSTGRES_PASSWORD: 'serra'
+            POSTGRES_DB: 'serra'
+        volumes:
+            - pgdata:/var/lib/postgresql/data
+
+    app:
+        build:
+            context: .
+            dockerfile: Dockerfile.local
+        container_name: serra_app
+        ports:
+            - 8001:8001
+        volumes:
+            - .:/var/www
+        depends_on:
+            - postgres
+
+volumes:
+    pgdata:

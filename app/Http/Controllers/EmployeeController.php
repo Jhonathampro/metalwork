@@ -11,7 +11,7 @@ class EmployeeController extends Controller
     public function index()
     {
         try {
-            $employees = Employee::all();
+            $employees = employee::all();
 
             return response()->json($employees, 200);
         } catch (\Exception $e) {

@@ -27,8 +27,12 @@ class SalaryResource extends Resource
                     ->label('Valor do salário')
                     ->numeric()
                     ->prefix('R$')
-                    ->required(),
-
+                    ->required()
+                    ->reactive()
+                    ->afterStateUpdated(function (\Filament\Forms\Set $set, $state, \Filament\Forms\Get $get) {
+                        $discount = $get('discount') ?? 0;
+                        $set('total', max(0, $state - $discount));
+                    }),
 
                 Forms\Components\TextInput::make('day')
                     ->label('Dia do pagamento')
@@ -38,14 +42,28 @@ class SalaryResource extends Resource
                        ->label('Desconto do pagamento')
                        ->numeric()
                        ->prefix('R$')
-                       ->required(),
+                       ->default(0)
+                       ->reactive()
+                       ->rule(function (\Filament\Forms\Get $get) {
+                           return function (string $attribute, $value, \Closure $fail) use ($get) {
+                               $salary = $get('value') ?? 0;
+                               if ($value > $salary) {
+                                   $fail('O desconto não pode ser maior que o salário.');
+                               }
+                           };
+                       })
+                       ->afterStateUpdated(function (\Filament\Forms\Set $set, $state, \Filament\Forms\Get $get) {
+                           $salary = $get('value') ?? 0;
+                           $set('total', max(0, $salary - $state));
+                       }),
 
                 Forms\Components\TextInput::make('total')
                     ->label('Valor total do pagamento')
                     ->numeric()
                     ->prefix('R$')
+                    ->disabled()
+                    ->dehydrated()
                     ->required(),
-
             ]);
     }
 
@@ -57,11 +75,11 @@ class SalaryResource extends Resource
                     ->label('Valor do salário')
                     ->money('BRL')
                     ->sortable(),
-                Tables\Columns\TextColumn::make('date')
-                    ->label('Data do pagamento')
-                    ->date('d/m'),
+                Tables\Columns\TextColumn::make('day')
+                    ->label('Dia do pagamento')
+                    ->sortable(),
                 Tables\Columns\TextColumn::make('total')
-                    ->label('Valor dtotal do pagamento')
+                    ->label('Valor total do pagamento')
                     ->money('BRL')
                     ->sortable(),
 

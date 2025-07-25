@@ -9,8 +9,6 @@ class salary extends Model
 {
     use HasFactory;
 
-    protected $table = 'salary';
-
     protected $fillable = [
         'value',
         'day',

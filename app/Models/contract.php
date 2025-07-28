@@ -11,18 +11,17 @@ class contract extends Model
 
     protected $fillable = [
         'date_admission',
-        'data_termination',
+        'date_termination',
         'benefits',
         'position',
-        'salary_id',
+        'value_salary',
+        'day_payment',
+        'discount_salary',
+        'total_salary',
 ];
 
     protected $casts = [
         'benefits' => 'array',
     ];
 
-    public function salary()
-    {
-        return $this->belongsTo(salary::class);
-    }
 }

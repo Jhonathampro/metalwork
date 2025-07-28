@@ -13,11 +13,15 @@ return new class extends Migration
     {
         Schema::create('contracts', function (Blueprint $table) {
             $table->id();
-            $table->string('data_admission');
-            $table->string('data_termination')->nullable();
+            $table->string('date_admission');
+            $table->string('date_termination')->nullable();
             $table->jsonb('benefits');
             $table->string('position');
-            $table->foreignId('salary_id')->constrained('salaries');
+            $table->decimal('value_salary', 10, 2);
+            $table->integer('day_payment');
+            $table->decimal('discount_salary', 10, 2);
+            $table->decimal('total_salary', 10, 2);
+
             $table->timestamps();
         });
     }
@@ -27,10 +31,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('contracts');
-        Schema::table('contracts', function (Blueprint $table) {
-            $table->dropForeign(['salary_id']);
-            $table->dropColumn('salary_id');
-        });
+
     }
 };

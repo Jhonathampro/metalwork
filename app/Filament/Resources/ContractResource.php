@@ -24,19 +24,16 @@ class ContractResource extends Resource
     {
         return $form
             ->schema([
-                Forms\Components\TextInput::make('date_admission')
+                Forms\Components\DatePicker::make('date_admission')
                     ->label('Dia da admissão')
                     ->required()
-                    ->rule('date_format:Y-m')
-                    ->placeholder('YYYY-MM')
-                    ->maxLength(7),
+                    ->minDate('2015-01-01')
+                    ->maxDate(now()->addYear()),
 
-                Forms\Components\TextInput::make('date_termination')
+                Forms\Components\DatePicker::make('date_termination')
                     ->label('Dia da rescisão')
-                    ->required()
-                    ->rule('date_format:Y-m')
-                    ->placeholder('YYYY-MM')
-                    ->maxLength(7),
+                    ->minDate('2015-01-01')
+                    ->maxDate(now()->addYear()),
 
                 Forms\Components\TagsInput::make('benefits')
                     ->label('Benefícios')
@@ -47,13 +44,48 @@ class ContractResource extends Resource
                     ->required()
                     ->maxLength(255),
 
-                Forms\Components\Select::make('salary_id')
-                    ->label('Salário')
-                    ->relationship('salary', 'total')
-                    ->searchable()
-                    ->required()
-                    ->default(fn () => salary::first()?->id)
 
+                Forms\Components\TextInput::make('value_salary')
+                    ->label('Valor do salário')
+                    ->numeric()
+                    ->prefix('R$')
+                    ->required()
+                    ->reactive()
+                    ->afterStateUpdated(function (\Filament\Forms\Set $set, $state, \Filament\Forms\Get $get) {
+                        $discount = $get('discount_salary') ?? 0;
+                        $set('total_salary', max(0, $state - $discount));
+                    }),
+
+                Forms\Components\TextInput::make('day_payment')
+                    ->label('Dia do pagamento')
+                    ->required(),
+
+                Forms\Components\TextInput::make('discount_salary')
+                    ->label('Desconto do pagamento')
+                    ->numeric()
+                    ->prefix('R$')
+                    ->default(0)
+                    ->reactive()
+                    ->rule(function (\Filament\Forms\Get $get) {
+                        return function (string $attribute, $value, \Closure $fail) use ($get) {
+                            $salary = $get('value_salary') ?? 0;
+                            if ($value > $salary) {
+                                $fail('O desconto não pode ser maior que o salário.');
+                            }
+                        };
+                    })
+                    ->afterStateUpdated(function (\Filament\Forms\Set $set, $state, \Filament\Forms\Get $get) {
+                        $salary = $get('value_salary') ?? 0;
+                        $set('total_salary', max(0, $salary - $state));
+                    }),
+
+                Forms\Components\TextInput::make('total_salary')
+                    ->label('Valor total do pagamento')
+                    ->numeric()
+                    ->prefix('R$')
+                    ->disabled()
+                    ->dehydrated()
+                    ->required(),
             ]);
     }
 
@@ -62,8 +94,7 @@ class ContractResource extends Resource
         return $table
             ->columns([
                 Tables\Columns\TextColumn::make('date_admission')
-                    ->label('Valor do salário')
-                    ->money('BRL')
+                    ->label('Data da contratação')
                     ->sortable(),
 
                 Tables\Columns\TextColumn::make('benefits')
@@ -75,10 +106,6 @@ class ContractResource extends Resource
                     ->label('Cargo')
                     ->searchable(),
 
-                Tables\Columns\TextColumn::make('salary')
-                    ->label('Valor total do pagamento')
-                    ->money('BRL')
-                    ->sortable(),
             ])
             ->filters([
                 //

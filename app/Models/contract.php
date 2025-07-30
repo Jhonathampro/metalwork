@@ -2,14 +2,13 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
 class contract extends Model
 {
-    use HasFactory;
 
     protected $fillable = [
+        'employee_id',
         'date_admission',
         'date_termination',
         'benefits',
@@ -23,5 +22,10 @@ class contract extends Model
     protected $casts = [
         'benefits' => 'array',
     ];
+
+    public function employee()
+    {
+        return $this->belongsTo(employee::class);
+    }
 
 }

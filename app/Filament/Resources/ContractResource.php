@@ -24,6 +24,11 @@ class ContractResource extends Resource
     {
         return $form
             ->schema([
+                Forms\Components\Select::make('employee_id')
+                    ->label('Documento')
+                    ->relationship('employee', 'document')
+                    ->required(),
+
                 Forms\Components\DatePicker::make('date_admission')
                     ->label('Dia da admissão')
                     ->required()

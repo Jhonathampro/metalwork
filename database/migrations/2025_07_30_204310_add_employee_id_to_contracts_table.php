@@ -11,16 +11,10 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('salary', function (Blueprint $table) {
-            $table->id();
-            $table->decimal('value', 10, 2);
-            $table->integer('day');
-            $table->decimal('discount', 10, 2);
-            $table->decimal('total', 10, 2);
-
-            $table->timestamps();
-
-
+        Schema::table('contracts', function (Blueprint $table) {
+            $table->foreignId('employee_id')
+                ->unique()
+                ->constrained('employees');
         });
     }
 
@@ -29,6 +23,8 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('salary');
+        Schema::table('contract', function (Blueprint $table) {
+            //
+        });
     }
 };

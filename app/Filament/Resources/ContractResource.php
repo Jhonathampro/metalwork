@@ -98,12 +98,14 @@ class ContractResource extends Resource
     {
         return $table
             ->columns([
-                Tables\Columns\TextColumn::make('date_admission')
-                    ->label('Data da contratação')
+                Tables\Columns\TextColumn::make('employee.document')
+
+                    ->label('Documento')
                     ->sortable(),
 
-                Tables\Columns\TextColumn::make('benefits')
-                    ->label('Benefícios')
+                Tables\Columns\TextColumn::make('total_salary')
+                    ->label('Valor total do pagamento')
+                    ->prefix('R$')
                     ->searchable()
                     ->sortable(),
 

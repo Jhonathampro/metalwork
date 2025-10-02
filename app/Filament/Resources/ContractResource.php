@@ -29,6 +29,11 @@ class ContractResource extends Resource
                     ->relationship('employee', 'document')
                     ->required(),
 
+                Forms\Components\Select::make('employee_id')
+                    ->label('Nome')
+                    ->relationship('employee', 'name')
+                    ->required(),
+
                 Forms\Components\DatePicker::make('date_admission')
                     ->label('Dia da admissão')
                     ->required()
